@@ -51,7 +51,10 @@ def getCharacter(tuple):
         pixel_average = tuple
     chars = [[' ', '░', '▒', '▓', '█'], [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'], [' ', '⠠', '⠒', '⡉', '⡖', '⡶', '⣶', '⣽', '⣿', '█', '█', '█']]
     chars = [' ', '░', '▒', '▓', '█']
-    tuple = [tuple[0], tuple[1], tuple[2]]
+    try:
+        tuple = [tuple[0], tuple[1], tuple[2]]
+    except TypeError:
+        tuple = [tuple, tuple, tuple]
     for i in range(len(tuple)):
         tuple[i] = tuple[i] / 256
     huey = hue(tuple)
