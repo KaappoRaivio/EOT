@@ -1,3 +1,7 @@
+width_correction_factor = 2
+saturation = 0.2
+
+
 from PIL import Image
 import sys, os, string, random
 
@@ -12,6 +16,7 @@ if path[0] != '/':
     path = pwd + '/' + path
 
 class colors:
+    all = ['\033[31m', '\033[33m', '\033[32m', '\033[36m', '\033[34m', '\033[35m', '\033[37m']
     black = '\033[30m'
     red = '\033[31m'
     yellow = '\033[33m'
@@ -21,74 +26,68 @@ class colors:
     magenta = '\033[35m'
     white = '\033[37m'
 
-def getColor(tuple):
-    possible_colors = [colors.red, colors.yellow, colors.green, colors.cyan, colors.blue,  colors.magenta]
-    try:
-        huey = hue(tuple) * 60
-    except TypeError:
-        return colors.white
-    if saturation(tuple) <= 0.1:
-        return colors.white
-    if huey >= 0 and huey < 30 or huey >= 330 and huey < 360:
+def getColor(hue):
+    possible_colors = colors.all
+    hue *= 60
+    if hue >= 0 and hue < 30 or hue >= 330 and hue < 360:
         return possible_colors[0]
-    elif huey >= 30 and huey < 90:
+    elif hue >= 30 and hue < 90:
         return possible_colors[1]
-    elif huey >= 90 and huey < 150:
+    elif hue >= 90 and hue < 150:
         return possible_colors[2]
-    elif huey >= 150 and huey < 210:
+    elif hue >= 150 and hue < 210:
         return possible_colors[3]
-    elif huey >= 210 and huey < 270:
+    elif hue >= 210 and hue < 270:
         return possible_colors[4]
-    elif huey >= 270 and huey < 330:
+    elif hue >= 270 and hue < 330:
         return possible_colors[5]
     else:
-        print(huey, tuple)
+        print(hue, tuple)
         raise(Exception)
 def getCharacter(tuple):
-    try:
-        pixel_average = sum(tuple) // len(tuple)
-    except TypeError:
-        pixel_average = tuple
-    chars = [[' ', '░', '▒', '▓', '█'], [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'], [' ', '⠠', '⠒', '⡉', '⡖', '⡶', '⣶', '⣽', '⣿', '█', '█', '█']]
+    #tuplen arvot ovat välillä 0 .. 1
     chars = [' ', '░', '▒', '▓', '█']
-    try:
-        tuple = [tuple[0], tuple[1], tuple[2]]
-    except TypeError:
-        tuple = [tuple, tuple, tuple]
-    for i in range(len(tuple)):
-        tuple[i] = tuple[i] / 256
-    huey = hue(tuple)
+    char = ''
+    HSV = [getHue(tuple), getSaturation(tuple), getLuminance(tuple)]
+    if HSV[0] == -1:
+        assert(HSV[1] == 0)
+    step = 1 / len(chars)
     for i in range(len(chars)):
-        step = 256 // len(chars)
-        if pixel_average in range(i * step, (i + 1) * step):
-            return getColor(tuple) + chars[i] * 2
-    return chars[0] * 2
-def luminance(tuple):
+        if HSV[2] > step * i and HSV[2] < step * (i + 1):
+            char = chars[i]
+    #print(HSV)
+    if HSV[1] <= saturation:
+        #print('hei')
+        return colors.white + char * 2
+    else:
+        return getColor(HSV[0]) + char * 2
+
+def getLuminance(tuple):
     return (max(tuple) + min(tuple)) / 2
-def saturation(tuple):
-    if luminance(tuple) <= 0.5:
+def getSaturation(tuple):
+    if getLuminance(tuple) >= 0.5:
         return (max(tuple) - min(tuple)) / (max(tuple) + min(tuple))
     else:
         return (max(tuple) - min(tuple)) / (2.0 - max(tuple) - min(tuple))
-def hue(tuple):
+def getHue(tuple):
     try:
         if max(tuple) == tuple[0]:
             if (tuple[1] - tuple[2]) / (max(tuple) - min(tuple)) < 0:
-                return (tuple[1] - tuple[2]) / (max(tuple) - min(tuple)) + 1
+                return (tuple[1] - tuple[2]) / (max(tuple) - min(tuple)) + 6
             else:
                 return (tuple[1] - tuple[2]) / (max(tuple) - min(tuple))
         if max(tuple) == tuple[1]:
             if 2.0 + (tuple[2] - tuple[0]) / (max(tuple) - min(tuple)) < 0:
-                return 2.0 + (tuple[2] - tuple[0]) / (max(tuple) - min(tuple)) + 1
+                return 2.0 + (tuple[2] - tuple[0]) / (max(tuple) - min(tuple)) + 6
             else:
                 return 2.0 + (tuple[2] - tuple[0]) / (max(tuple) - min(tuple))
         if max(tuple) == tuple[2]:
             if 4.0 + (tuple[0] - tuple[1]) / (max(tuple) - min(tuple)) < 0:
-                return 4.0 + (tuple[0] - tuple[1]) / (max(tuple) - min(tuple)) + 1
+                return 4.0 + (tuple[0] - tuple[1]) / (max(tuple) - min(tuple)) + 6
             else:
-                4.0 + (tuple[0] - tuple[1]) / (max(tuple) - min(tuple))
+                return 4.0 + (tuple[0] - tuple[1]) / (max(tuple) - min(tuple))
     except ZeroDivisionError:
-        return None
+        return -1
 try:
     Im = Image.open(path)
 except FileNotFoundError:
@@ -100,7 +99,7 @@ except FileNotFoundError:
     print("Error: The file `{}' is non-existent".format(path))
     quit()
 
-scaled_width = int(sys.argv[1]) // 2.00000
+scaled_width = int(sys.argv[1]) // width_correction_factor
 
 
 aspect_ratio = Im.size[0] / Im.size[1]
@@ -115,11 +114,16 @@ Im.thumbnail(size)
 
 merkit = []
 
-print('\e[34m')
-
 pix = Im.load()
 for a in range(Im.size[1]):
     temp = []
     for i in range(Im.size[0]):
-        temp.append(getCharacter(pix[i, a]))
+        zero_to_one = []
+        try:
+            zero_to_one = [pix[i, a][0], pix[i, a][1], pix[i, a][2]]
+        except TypeError:
+            zero_to_one = [pix[i, a], pix[i, a], pix[i, a]]
+        for i in range(len(zero_to_one)):
+            zero_to_one[i] = zero_to_one[i] / 255
+        temp.append(getCharacter(zero_to_one))
     print(''.join(temp))
