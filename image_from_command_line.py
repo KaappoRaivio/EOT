@@ -46,14 +46,17 @@ def getColor(hue):
         raise(Exception)
 def getCharacter(tuple):
     #tuplen arvot ovat välillä 0 .. 1
+
     chars = [' ', '░', '▒', '▓', '█']
     char = ''
     HSV = [getHue(tuple), getSaturation(tuple), getLuminance(tuple)]
     if HSV[0] == -1:
         assert(HSV[1] == 0)
+    #print(HSV)
     step = 1 / len(chars)
     for i in range(len(chars)):
-        if HSV[2] > step * i and HSV[2] < step * (i + 1):
+        if HSV[2] >= step * i and HSV[2] < step * (i + 1):
+            #print('{}:{}'.format(step*i, step*(i+1)))
             char = chars[i]
     #print(HSV)
     if HSV[1] <= saturation:
