@@ -15,5 +15,5 @@ I'd suggest for creating an alias for ease of operation:
 $ sudo apt install tput
 ```
 ```
-alias eot='width=$(tput cols); python3 /path/to/the/script $width'
+alias eot='width=$(tput cols); python3 /path/to/the/script.py $width'
 ```
