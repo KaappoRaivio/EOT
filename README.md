@@ -9,7 +9,7 @@ Basically, you download the script shown in the master branch, and exploit him w
 ```bash
 $ python3 /path/to/the/script.py <width> /path/to/the/image.png
 ```
-The ```<width>``` can be set first to 100, that should work fine with a full-screen terminal. He can process all kinds of path notations: _/home/user/foo.png_;_~/Desktop/asd.jpg_;_ foo/goo/image.jpg_.
+The ```<width>``` can be set first to 100, that should work fine with a full-screen terminal. He can process all kinds of path notations: _/home/user/foo.png_;_~/Desktop/asd.jpg_;_foo/goo/image.jpg_.
 I'd suggest for creating an alias for ease of operation:
 ```bash
 $ sudo apt install tput
