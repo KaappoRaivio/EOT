@@ -1,5 +1,5 @@
 # Why You Should Read This:
-Have you ever tried to look the contents of an image without any graphical software or a GUI without succeeding? Yes, me too. Through the history of humankind have the humans been unable to perform these kind of actions without a GUI. Well, this is about to change.
+Have you ever tried to look the contents of an image without any graphical software or a GUI without succeeding? Yes, me too. Throughout the history of humankind have the humans been unable to perform these kind of actions without a GUI. Well, this is about to change.
 Introducing: 
 ## The EOT
 ### Who is He?
