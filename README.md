@@ -3,7 +3,7 @@ Have you ever tried to look the contents of an image without any graphical softw
 Introducing: 
 ## The EOT
 ### Who is He?
-EOT is a python script created by Kaappo Raivio in 2017. He can look for an image and, display its contents using unicode block characters for luminance control and ASCII escape sequences for color control.
+EOT is a python script created by Kaappo Raivio in 2017. He can look for an image and, using unicode block characters for luminance control and ASCII escape sequences for color control, display its contents.
 ### How Does one exploit Him?
 Basically, you download the script shown in the master branch, and exploit him with the same care as shown in the following illustration:
 ```bash
