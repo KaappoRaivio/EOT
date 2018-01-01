@@ -1,4 +1,6 @@
-width_correction_factor = 2
+#!/usr/bin/python3
+height_correction_factor = 0.98
+width_correction_factor = 1
 saturation = 0.2
 
 
@@ -6,7 +8,7 @@ from PIL import Image
 import sys, os, string, random
 
 try:
-    path = sys.argv[2]
+    path = sys.argv[3]
 except IndexError:
     print('(c) Kaappo Raivio 2017')
     quit()
@@ -57,6 +59,8 @@ def getCharacter(tuple):
     for i in range(len(chars)):
         if HSV[2] >= step * i and HSV[2] < step * (i + 1):
             char = chars[i]
+    if char == '':
+        char = chars[len(chars) -1]
 
     if HSV[1] <= saturation:
         return colors.white + char * 2
@@ -101,13 +105,26 @@ except OSError:
     print('Error: {} is not an image'.format(path))
     quit()
 
-scaled_width = int(sys.argv[1]) // width_correction_factor
+current_terminal_width = int(sys.argv[1])
+current_terminal_height = int(sys.argv[2])
 
-aspect_ratio = Im.size[0] / Im.size[1]
-scaled_height = scaled_width // aspect_ratio
+image_aspect_ratio = Im.size[0] / Im.size[1]
+terminal_aspect_ratio = current_terminal_width / current_terminal_height
+
+scaled_height, scaled_width = 0, 0
+
+if terminal_aspect_ratio >= image_aspect_ratio:
+    #korkeus
+    scaled_height = current_terminal_height * height_correction_factor
+    scaled_width = scaled_height * image_aspect_ratio * width_correction_factor
+else:
+    #leveys
+    scaled_width = current_terminal_width * width_correction_factor
+    scaled_height = (scaled_width / image_aspect_ratio) * height_correction_factor
 
 size = scaled_width, scaled_height
 Im.thumbnail(size)
+
 
 merkit = []
 
