@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-height_correction_factor = 0.98
-width_correction_factor = 1
+height_correction_factor = 2
+width_correction_factor = 0.5
 saturation = 0.2
 
 
